@@ -34,6 +34,12 @@ func init() {
 		keyvaultAuthorizer, err = auth.NewAuthorizerFromFileWithResource(resource)
 	} else {
 		keyvaultAuthorizer, err = auth.NewAuthorizerFromEnvironmentWithResource(resource)
+		if err.Error() == "MSI not available" {
+			settings := &auth.MSIConfig{
+				Resource: azure.PublicCloud.KeyVaultEndpoint,
+			}
+			keyvaultAuthorizer, err = settings.Authorizer()
+		}
 	}
 	if err != nil {
 		log.Fatal(err)
